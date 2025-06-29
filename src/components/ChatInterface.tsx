@@ -5,22 +5,22 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card, CardContent } from './ui/card'
 // Simple SVG icons as components
-const Send = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const Send = ({ className }: { className?: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
     <line x1="22" y1="2" x2="11" y2="13"></line>
     <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
   </svg>
 )
 
-const User = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const User = ({ className }: { className?: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
     <circle cx="12" cy="7" r="4"></circle>
   </svg>
 )
 
-const Bot = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const Bot = ({ className }: { className?: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
     <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
     <circle cx="12" cy="5" r="2"></circle>
     <path d="M12 7v4"></path>
