@@ -105,36 +105,24 @@ export async function POST(request) {
       )
     }
 
-    const formData = await request.formData()
-    const file = formData.get('file')
+    // Parse JSON request (client-side parsed text)
+    const { fileName, fileSize, extractedText } = await request.json()
     
-    if (!file || !file.type.includes('pdf')) {
+    if (!fileName || !extractedText) {
       return NextResponse.json(
-        { error: 'No PDF file uploaded' },
+        { error: 'Missing fileName or extractedText' },
         { status: 400, headers: corsHeaders }
       )
     }
 
     const documentId = uuidv4()
 
-    // 1. For now, return a placeholder response for PDF uploads
-    // In production, this would be handled by a dedicated PDF processing service
-    const fullText = `PDF 파일 업로드됨: ${file.name}
-    
-    이것은 PDF 텍스트 추출 플레이스홀더입니다. 
-    실제 환경에서는 전용 PDF 처리 서비스를 사용하거나
-    서버리스 함수에서 안정적인 PDF 파싱 라이브러리를 구현해야 합니다.
-    
-    현재 파일 정보:
-    - 파일명: ${file.name}
-    - 크기: ${file.size} bytes
-    - 타입: ${file.type}
-    
-    이 텍스트를 기반으로 임베딩과 벡터 저장을 진행합니다.`
+    // Use the client-side extracted text
+    const fullText = extractedText
 
     if (!fullText || fullText.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Could not extract text from PDF' },
+        { error: 'Extracted text is empty' },
         { status: 400, headers: corsHeaders }
       )
     }
@@ -160,7 +148,7 @@ export async function POST(request) {
       values: embeddings[i],
       metadata: {
         documentId,
-        fileName: file.name,
+        fileName: fileName,
         text: chunk.text,
         chunkIndex: i,
         startPosition: chunk.start,
@@ -178,7 +166,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       documentId,
-      fileName: file.name,
+      fileName: fileName,
       totalChunks: chunks.length,
       totalTokens: fullText.length,
       status: 'completed'

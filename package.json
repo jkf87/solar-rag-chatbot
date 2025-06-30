@@ -12,9 +12,11 @@
     "@pinecone-database/pinecone": "^6.1.1",
     "@stagewise-plugins/react": "^0.4.9",
     "@stagewise/toolbar-next": "^0.4.9",
+    "canvas": "^3.1.2",
     "formidable": "^3.5.4",
     "next": "15.3.4",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^3.11.174",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "uuid": "^11.1.0"

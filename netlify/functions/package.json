@@ -1,0 +1,11 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Solar RAG Chatbot",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^3.0.0",
+    "formidable": "^3.5.1",
+    "pdf-parse": "^1.1.1",
+    "uuid": "^10.0.0"
+  }
+} 

@@ -3,6 +3,10 @@
 import { useState, useRef } from 'react'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import * as pdfjsLib from 'pdfjs-dist'
+
+// Configure PDF.js worker - use a stable CDN version that exists
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
 // Simple SVG icons as components
 const Upload = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -54,6 +58,25 @@ export function FileUploader() {
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Client-side PDF parsing function
+  const parsePDF = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer()
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+    
+    let fullText = ''
+    
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ')
+      fullText += pageText + '\n\n'
+    }
+    
+    return fullText.trim()
+  }
+
   const handleFiles = async (fileList: FileList) => {
     const acceptedFiles = Array.from(fileList).filter(file => 
       file.type === 'application/pdf'
@@ -63,6 +86,7 @@ export function FileUploader() {
       alert('Please select PDF files only.')
       return
     }
+    
     const newFiles = acceptedFiles.map(file => ({
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       name: file.name,
@@ -73,33 +97,41 @@ export function FileUploader() {
 
     setFiles(prev => [...prev, ...newFiles])
 
-    // Process each file
+    // Process each file with client-side parsing
     for (const file of acceptedFiles) {
       const fileId = newFiles.find(f => f.name === file.name)?.id
       if (!fileId) continue
 
       try {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        // Update status to uploading
+        // Update status to parsing
         setFiles(prev => prev.map(f => 
-          f.id === fileId ? { ...f, status: 'uploading', progress: 0 } : f
+          f.id === fileId ? { ...f, status: 'uploading', progress: 10 } : f
         ))
 
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        })
-
-        if (!response.ok) {
-          throw new Error('Upload failed')
-        }
-
+        // Parse PDF on client-side
+        const extractedText = await parsePDF(file)
+        
         // Update status to processing
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'processing', progress: 50 } : f
         ))
+
+        // Send parsed text to server for embedding and storage
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileSize: file.size,
+            extractedText: extractedText
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Processing failed')
+        }
 
         const result = await response.json()
 
@@ -109,6 +141,7 @@ export function FileUploader() {
         ))
 
       } catch (error) {
+        console.error('File processing error:', error)
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { 
             ...f, 
