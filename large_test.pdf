@@ -1,0 +1,113 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 2000
+>>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(Solar RAG Chatbot Test Document) Tj
+0 -20 Td
+(This is a comprehensive test document for the Solar RAG chatbot system.) Tj
+0 -20 Td
+(It contains multiple paragraphs and sections to test chunking functionality.) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Introduction to RAG Systems:) Tj
+0 -20 Td
+(Retrieval-Augmented Generation combines information retrieval with) Tj
+0 -20 Td
+(language generation to provide more accurate and contextual responses.) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Key Components:) Tj
+0 -20 Td
+(1. Document Processing - Extract and prepare text from various sources) Tj
+0 -20 Td
+(2. Text Chunking - Split documents into manageable pieces) Tj
+0 -20 Td
+(3. Embedding Generation - Convert text chunks into vector representations) Tj
+0 -20 Td
+(4. Vector Storage - Store embeddings in specialized databases) Tj
+0 -20 Td
+(5. Retrieval and Generation - Search relevant chunks and generate responses) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Solar AI Embedding Models:) Tj
+0 -20 Td
+(Solar embedding models excel at Korean language processing and provide) Tj
+0 -20 Td
+(high-quality semantic representations for various domains and use cases.) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Testing Methodology:) Tj
+0 -20 Td
+(This document is designed to test multiple aspects of the RAG system:) Tj
+0 -20 Td
+(- Text extraction from PDF format) Tj
+0 -20 Td
+(- Proper chunking of long content) Tj
+0 -20 Td
+(- Embedding generation for each chunk) Tj
+0 -20 Td
+(- Vector database storage and retrieval) Tj
+0 -20 Td
+() Tj
+0 -20 Td
+(Expected Behavior:) Tj
+0 -20 Td
+(The system should split this document into multiple chunks based on) Tj
+0 -20 Td
+(the configured chunk size and overlap parameters. Each chunk should) Tj
+0 -20 Td
+(be converted to embeddings and stored in the Pinecone vector database.) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000010 00000 n 
+0000000060 00000 n 
+0000000120 00000 n 
+0000000200 00000 n 
+
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+
+startxref
+2250
+%%EOF

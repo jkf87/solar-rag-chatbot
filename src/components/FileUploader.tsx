@@ -78,11 +78,20 @@ export function FileUploader() {
   }
 
   const handleFiles = async (fileList: FileList) => {
-    const acceptedFiles = Array.from(fileList).filter(file => 
-      file.type === 'application/pdf'
-    )
+    console.log('📁 파일 업로드 시작:', fileList.length, '개 파일')
+    
+    const acceptedFiles = Array.from(fileList).filter(file => {
+      if (file.type === 'application/pdf') {
+        console.log('✅ PDF 파일 승인됨:', file.name, `${(file.size / 1024).toFixed(1)}KB`)
+        return true
+      } else {
+        console.log('❌ PDF가 아닌 파일 거부됨:', file.name, file.type)
+        return false
+      }
+    })
     
     if (acceptedFiles.length === 0) {
+      console.log('⚠️ 업로드할 유효한 파일이 없음')
       alert('Please select PDF files only.')
       return
     }
@@ -96,22 +105,28 @@ export function FileUploader() {
     }))
 
     setFiles(prev => [...prev, ...newFiles])
+    console.log('📋 파일 상태 초기화 완료:', newFiles.length, '개 파일')
 
     // Process each file with client-side parsing
     for (const file of acceptedFiles) {
       const fileId = newFiles.find(f => f.name === file.name)?.id
       if (!fileId) continue
 
+      console.log(`🔄 파일 처리 시작: ${file.name}`)
+
       try {
         // Update status to parsing
+        console.log(`📖 PDF 파싱 시작: ${file.name}`)
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'uploading', progress: 10 } : f
         ))
 
         // Parse PDF on client-side
         const extractedText = await parsePDF(file)
+        console.log(`✅ PDF 파싱 완료: ${file.name} - 텍스트 길이: ${extractedText.length}자`)
         
         // Update status to processing
+        console.log(`🚀 서버 업로드 시작: ${file.name}`)
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'processing', progress: 50 } : f
         ))
@@ -129,19 +144,26 @@ export function FileUploader() {
           }),
         })
 
+        console.log(`📡 서버 응답 수신: ${file.name} - 상태: ${response.status}`)
+
         if (!response.ok) {
+          const errorText = await response.text()
+          console.error(`❌ 서버 오류: ${file.name} - ${response.status}: ${errorText}`)
           throw new Error('Processing failed')
         }
 
         const result = await response.json()
+        console.log(`🎉 파일 처리 완료: ${file.name}`, result)
 
         // Update status to completed
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'completed', progress: 100 } : f
         ))
 
+        console.log(`✅ UI 업데이트 완료: ${file.name} - 상태: completed`)
+
       } catch (error) {
-        console.error('File processing error:', error)
+        console.error(`💥 파일 처리 실패: ${file.name}`, error)
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { 
             ...f, 
@@ -152,6 +174,8 @@ export function FileUploader() {
         ))
       }
     }
+    
+    console.log('🏁 전체 파일 업로드 프로세스 완료')
   }
 
   const handleDragOver = (e: React.DragEvent) => {
