@@ -49,8 +49,8 @@ async function generateEmbeddings(texts, apiKey) {
   console.log(`🔮 임베딩 생성 시작: ${texts.length}개 텍스트`)
   const embeddings = []
   
-  // Process in batches to avoid rate limits
-  const batchSize = 5
+  // Process in batches to avoid rate limits - OPTIMIZED for larger files
+  const batchSize = 20 // Increased from 5 to 20 for faster processing
   const totalBatches = Math.ceil(texts.length / batchSize)
   console.log(`📊 배치 처리: ${totalBatches}개 배치 (배치당 ${batchSize}개)`)
   
@@ -86,10 +86,10 @@ async function generateEmbeddings(texts, apiKey) {
     
     console.log(`✅ 배치 ${batchNum} 완료: ${batchEmbeddings.length}개 임베딩 생성`)
     
-    // Add delay between batches
+    // Reduced delay between batches for faster processing
     if (i + batchSize < texts.length) {
-      console.log('⏳ 다음 배치 전 1초 대기...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('⏳ 다음 배치 전 300ms 대기...')
+      await new Promise(resolve => setTimeout(resolve, 300)) // Reduced from 1000ms to 300ms
     }
   }
   
@@ -156,9 +156,9 @@ exports.handler = async (event, context) => {
     const fullText = extractedText
     console.log(`🆔 문서 ID 생성: ${documentId}`)
 
-    // 2. Split text into chunks
+    // 2. Split text into chunks - OPTIMIZED for larger files
     console.log('✂️ 텍스트 청크 분할 시작...')
-    const chunks = splitText(fullText, 1000, 200)
+    const chunks = splitText(fullText, 1500, 250) // Increased chunk size to reduce total chunks
     console.log(`✅ ${chunks.length}개 청크 생성 완료`)
 
     // 3. Generate embeddings for each chunk
@@ -193,8 +193,8 @@ exports.handler = async (event, context) => {
 
     console.log(`📦 ${vectors.length}개 벡터 준비 완료`)
 
-    // Upsert vectors in batches
-    const batchSize = 100
+    // Upsert vectors in batches - OPTIMIZED
+    const batchSize = 200 // Increased from 100 to 200 for faster upload
     for (let i = 0; i < vectors.length; i += batchSize) {
       const batch = vectors.slice(i, i + batchSize)
       console.log(`📤 배치 ${Math.floor(i/batchSize) + 1}/${Math.ceil(vectors.length/batchSize)} 업로드 중... (${batch.length}개 벡터)`)

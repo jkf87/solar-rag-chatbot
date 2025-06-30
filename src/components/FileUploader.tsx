@@ -79,16 +79,24 @@ export function FileUploader() {
 
   const handleFiles = async (fileList: FileList) => {
     console.log('📁 파일 업로드 시작:', fileList.length, '개 파일')
-    alert(`🚨 디버그: 파일 업로드 시작 - ${fileList.length}개 파일`)
     
     const acceptedFiles = Array.from(fileList).filter(file => {
-      if (file.type === 'application/pdf') {
-        console.log('✅ PDF 파일 승인됨:', file.name, `${(file.size / 1024).toFixed(1)}KB`)
-        return true
-      } else {
+      if (file.type !== 'application/pdf') {
         console.log('❌ PDF가 아닌 파일 거부됨:', file.name, file.type)
+        alert(`❌ PDF 파일만 업로드 가능합니다: ${file.name}`)
         return false
       }
+      
+      // Check file size limit (5MB)
+      const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+      if (file.size > maxSize) {
+        console.log('❌ 파일 크기 초과:', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`)
+        alert(`❌ 파일 크기가 너무 큽니다: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)\n최대 5MB까지 업로드 가능합니다.`)
+        return false
+      }
+      
+      console.log('✅ PDF 파일 승인됨:', file.name, `${(file.size / 1024).toFixed(1)}KB`)
+      return true
     })
     
     if (acceptedFiles.length === 0) {
@@ -165,7 +173,7 @@ export function FileUploader() {
 
       } catch (error) {
         console.error(`💥 파일 처리 실패: ${file.name}`, error)
-        alert(`🚨 오류 발생: ${file.name} - ${error instanceof Error ? error.message : '알 수 없는 오류'}`)
+        // alert(`🚨 오류 발생: ${file.name} - ${error instanceof Error ? error.message : '알 수 없는 오류'}`) // Commented out for production
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { 
             ...f, 
