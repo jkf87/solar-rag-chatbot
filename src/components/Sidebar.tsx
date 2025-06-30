@@ -34,9 +34,19 @@ const DollarSign = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 )
 
-export function Sidebar() {
+const X = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+)
+
+interface SidebarProps {
+  onClose?: () => void
+}
+
+export function Sidebar({ onClose }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'files' | 'models' | 'settings'>('files')
-  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const tabs = [
     { id: 'files', label: 'Files', icon: FileText },
@@ -45,11 +55,22 @@ export function Sidebar() {
   ]
 
   return (
-    <div className="w-80 border-r bg-background">
+    <div className="w-80 md:w-80 sm:w-72 xs:w-64 h-full border-r bg-background shadow-lg md:shadow-none">
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b flex items-center justify-between">
           <h2 className="font-semibold text-lg">Solar RAG Chat</h2>
+          {/* 모바일에서만 보이는 닫기 버튼 */}
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="md:hidden"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
 
         {/* Tab Navigation */}
@@ -60,18 +81,19 @@ export function Sidebar() {
               <Button
                 key={tab.id}
                 variant={activeTab === tab.id ? 'default' : 'ghost'}
-                className="flex-1 rounded-none"
+                className="flex-1 rounded-none text-xs sm:text-sm"
                 onClick={() => setActiveTab(tab.id as any)}
               >
-                <Icon className="w-4 h-4 mr-2" />
-                {tab.label}
+                <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.charAt(0)}</span>
               </Button>
             )
           })}
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
           {activeTab === 'files' && (
             <div className="space-y-4">
               <FileUploader />
@@ -109,7 +131,7 @@ export function Sidebar() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">Current Model:</label>
-                      <span className="text-sm text-muted-foreground">solar-pro2-preview</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">solar-pro2-preview</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">Temperature:</label>
@@ -131,7 +153,7 @@ export function Sidebar() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">Current Model:</label>
-                      <span className="text-sm text-muted-foreground">solar-embedding-1-large-query</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">solar-embedding-1-large-query</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">Dimensions:</label>
@@ -175,11 +197,11 @@ export function Sidebar() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Chunk Size:</label>
-                    <span className="text-sm text-muted-foreground">1000</span>
+                    <span className="text-sm text-muted-foreground">1500</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Overlap:</label>
-                    <span className="text-sm text-muted-foreground">200</span>
+                    <span className="text-sm text-muted-foreground">250</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Top K:</label>
@@ -198,8 +220,12 @@ export function Sidebar() {
                     <span className="font-medium">Pinecone</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Index:</span>
+                    <span>Status:</span>
                     <span className="font-medium text-green-600">Connected</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Index:</span>
+                    <span className="font-medium">simplerag</span>
                   </div>
                 </CardContent>
               </Card>
