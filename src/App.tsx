@@ -1,7 +1,7 @@
 import { Sidebar } from '@/components/Sidebar'
 import { ChatInterface } from '@/components/ChatInterface'
 
-export default function Home() {
+function App() {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -11,3 +11,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default App
