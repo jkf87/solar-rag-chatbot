@@ -55,7 +55,7 @@ async function generateEmbeddings(texts, apiKey) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'solar-1-mini-embedding',
+        model: 'solar-embedding-1-large-passage',
         input: batch
       })
     })
