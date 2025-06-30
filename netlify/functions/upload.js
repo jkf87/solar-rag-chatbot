@@ -1,8 +1,4 @@
 const { Pinecone } = require('@pinecone-database/pinecone')
-const formidable = require('formidable')
-const fs = require('fs')
-const path = require('path')
-const pdfParse = require('pdf-parse')
 const { v4: uuidv4 } = require('uuid')
 
 const corsHeaders = {
@@ -112,40 +108,19 @@ exports.handler = async (event, context) => {
       throw new Error('Pinecone configuration missing')
     }
 
-    // Parse the multipart form data
-    const form = formidable({
-      maxFileSize: 10 * 1024 * 1024, // 10MB limit
-      allowEmptyFiles: false,
-      filter: function ({ name, originalFilename, mimetype }) {
-        return mimetype && mimetype.includes('pdf')
-      }
-    })
-
-    const [fields, files] = await form.parse(event.body)
+    // Parse JSON body (text is already extracted on client side)
+    const { fileName, fileSize, extractedText } = JSON.parse(event.body)
     
-    if (!files.file || !files.file[0]) {
+    if (!extractedText || extractedText.trim().length === 0) {
       return {
         statusCode: 400,
         headers: corsHeaders,
-        body: JSON.stringify({ error: 'No PDF file uploaded' })
+        body: JSON.stringify({ error: 'No text content provided' })
       }
     }
 
-    const file = files.file[0]
     const documentId = uuidv4()
-
-    // 1. Extract text from PDF
-    const pdfBuffer = fs.readFileSync(file.filepath)
-    const pdfData = await pdfParse(pdfBuffer)
-    const fullText = pdfData.text
-
-    if (!fullText || fullText.trim().length === 0) {
-      return {
-        statusCode: 400,
-        headers: corsHeaders,
-        body: JSON.stringify({ error: 'Could not extract text from PDF' })
-      }
-    }
+    const fullText = extractedText
 
     // 2. Split text into chunks
     const chunks = splitText(fullText, 1000, 200)
@@ -168,7 +143,7 @@ exports.handler = async (event, context) => {
       values: embeddings[i],
       metadata: {
         documentId,
-        fileName: file.originalFilename,
+        fileName: fileName,
         text: chunk.text,
         chunkIndex: i,
         startPosition: chunk.start,
@@ -184,15 +159,12 @@ exports.handler = async (event, context) => {
       await index.upsert(batch)
     }
 
-    // Clean up temporary file
-    fs.unlinkSync(file.filepath)
-
     return {
       statusCode: 200,
       headers: corsHeaders,
       body: JSON.stringify({
         documentId,
-        fileName: file.originalFilename,
+        fileName: fileName,
         totalChunks: chunks.length,
         totalTokens: fullText.length,
         status: 'completed'
