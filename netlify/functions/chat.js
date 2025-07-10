@@ -148,7 +148,7 @@ Please provide a comprehensive answer based on the context above.`
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'solar-pro2-preview',
+        model: 'solar-pro2',
         messages: messages,
         temperature: 0.1,
         max_tokens: 1000
